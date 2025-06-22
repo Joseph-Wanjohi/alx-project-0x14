@@ -1,40 +1,96 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+## API Overview
 
-## Getting Started
+MoviesDatabase is a free API that provides up-to-date information for 9 million+ movies, series, episodes, and 11 million+ actors/crew. You get details like trailers, awards, biographies, ratings, and more.
 
-First, run the development server:
+## Version
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+_Not specified in the documentation._
+
+## Available Endpoints
+
+- **GET** `/titles`  
+  Returns a list of titles (movies, series, episodes) with optional filters (genre, year, sorting).
+- **GET** `/x/titles-by-ids`  
+  Returns multiple titles by providing an array of IMDb IDs.
+- **GET** `/titles/{id}`  
+  Returns detailed info for one title by its IMDb ID.
+- **GET** `/titles/{id}/ratings`  
+  Returns average rating and vote count for a title.
+- **GET** `/titles/series/{id}`  
+  Returns all episodes for a series (id = series IMDb ID).
+- **GET** `/titles/seasons/{id}`  
+  Returns total number of seasons for a series.
+- **GET** `/titles/series/{id}/{season}`  
+  Returns episodes for one season of a series.
+- **GET** `/titles/episode/{id}`  
+  Returns info for a single episode.
+- **GET** `/titles/x/upcoming`  
+  Returns upcoming titles.
+- **GET** `/titles/search/keyword/{keyword}`  
+  Search titles by keyword.
+- **GET** `/titles/search/title/{title}`  
+  Search titles by (partial) title.
+- **GET** `/titles/search/akas/{aka}`  
+  Search titles by exact AKA.
+- **GET** `/actors`  
+  Returns a list of actors with pagination.
+- **GET** `/actors/{id}`  
+  Returns details for one actor.
+- **GET** `/title/utils/titleType`  
+  Returns a list of title types (movie, series, etc.).
+- **GET** `/title/utils/genres`  
+  Returns a list of genres.
+- **GET** `/title/utils/lists`  
+  Returns predefined title lists (e.g., top-rated).
+
+## Request and Response Format
+
+- **Requests** use standard HTTP GET and optional query parameters (`page`, `limit`, `info`, `genre`, etc.).
+- **Responses** are JSON objects with a `results` array and pagination fields (`page`, `next`, `entries`) when applicable.
+
+**Example Request:**
+
+```http
+GET /titles?genre=Comedy&limit=5&page=1
+Example Response:
+
+json
+Copy
+Edit
+{
+  "results": [
+    { 
+      "id": "tt1234567", 
+      "titleText": "Funny Movie", 
+      … 
+    }
+  ],
+  "page": 1,
+  "next": "/titles?genre=Comedy&limit=5&page=2",
+  "entries": 5
+}
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Authentication
+No authentication required for the BASIC plan. Just send requests to the base URL.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+## Error Handling
+**400 Bad Request** Invalid parameter values. Check query names/types.
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+**404 Not Found**
+ID or path does not exist.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+**429 Too Many Requests**
+Rate limit exceeded. Retry after a pause.
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**500 Server Error**
+Server problem. Retry later or contact API support.
 
-## Learn More
+## Usage Limits and Best Practices
+**Rate Limit:** Up to 50 items per page; overall call limits not specified.
 
-To learn more about Next.js, take a look at the following resources:
+**Batch Requests:** Use /x/titles-by-ids to fetch multiple titles in one call.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+**Caching**: Cache repeated requests (e.g., static info) to reduce load.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+**Filtering:** Use the info parameter to request only needed fields (e.g., mini_info, base_info).
